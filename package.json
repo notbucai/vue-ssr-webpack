@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "webpack --config ./config/webpack.common.js",
-    "start": "nodemon ./server/index.js"
+    "start": "nodemon ./server/index.js",
+    "commit": "git-cz"
   },
   "keywords": [],
   "author": "",
