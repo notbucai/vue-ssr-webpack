@@ -1,6 +1,8 @@
-const Vue = require('vue');
-const VueRouter = require('vue-router');
-
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import A from '../../src/A.vue'
+// 实例Vue之前调用否则会有一次空白
+Vue.use(VueRouter);
 const router = new VueRouter({
   mode: "history",
   routes: [
@@ -21,14 +23,14 @@ const router = new VueRouter({
   ]
 });
 
-module.exports = function createVm(context) {
+export default function createVm(context) {
 
-  Vue.use(VueRouter);
   const app = new Vue({
     router,
-    template: `<router-view></router-view>`
+    components: { A },
+    template: '<A/>'
   });
-  
+
   return {
     app, router
   }

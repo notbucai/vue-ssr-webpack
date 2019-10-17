@@ -1,29 +1,36 @@
-const webpack = require('webpack');
 const Koa = require('koa');
+const logger = require('koa-logger');
 const path = require('path');
-const renderer = require('vue-server-renderer').createRenderer({
-  template: require('fs').readFileSync(path.resolve(__dirname, '../public/index.html'), 'utf-8')
-})
-// const koaWebpack = require('koa-webpack');
-// const compiler = webpack(require('../config/webpack.common'));
+const devServer = require('./dev-server');
+const VueSR = require('vue-server-renderer');
+let bundleRenderer;
 
-const serverEntry = require('../src/entry-server')
+devServer((serverBundle, clientBundle, template) => {
+  console.log("bundleRenderer 准备");
+
+  bundleRenderer = VueSR.createBundleRenderer(serverBundle, {
+    template,
+    renInNewContext: false
+  });
+});
 
 async function init() {
   const app = new Koa();
-  // const webpackMiddleware = await koaWebpack({ compiler });
-
-  // app.use(webpackMiddleware); 
+  app.use(logger());
   app.use(async (ctx, next) => {
-    
-    try {
-      const vm = await serverEntry(ctx); 
 
-      const html = await renderer.renderToString(vm);
+    try {
+      const html = await bundleRenderer.renderToString({
+        url: ctx.url
+      });
       ctx.body = html;
 
     } catch (error) {
-      ctx.body = 404;
+      ctx.status = error.code || 404;
+      ctx.body = {
+        code: ctx.status,
+        errmsg: error.message || error.msg || error || "未知错误"
+      };
     }
 
   });
